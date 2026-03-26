@@ -1,16 +1,19 @@
 // ==UserScript==
 // @name         Force 1080p on Twitch & Kick
 // @namespace    http://tampermonkey.net/
-// @version      7.4
-// @description  Auto-closes Twitch quality menu reliably (new 2026 UI) + quality drop watcher
+// @version      1.3
+// @description  Force highest quality on Twitch or Kick + quality drop watcher
 // @match        *://*.twitch.tv/*
 // @match        *://*.kick.com/*
 // @grant        none
+// @license MIT
+// @downloadURL https://update.greasyfork.org/scripts/571237/Force%201080p%20on%20Twitch%20%20Kick.user.js
+// @updateURL https://update.greasyfork.org/scripts/571237/Force%201080p%20on%20Twitch%20%20Kick.meta.js
 // ==/UserScript==
 
 (function () {
     'use strict';
-    console.log("[Skrypt 1080p v7.4] Wstrzyknięto na: " + location.hostname);
+    console.log("[Skrypt 1080p ] Wstrzyknięto na: " + location.hostname);
 
     let attemptInterval;
     let watcherInterval;
@@ -63,11 +66,11 @@
             const settingsBtn = document.querySelector('[data-a-target="player-settings-button"]');
             if (settingsBtn) {
                 settingsBtn.click(); // drugie kliknięcie w trybik = zamknięcie całego panelu
-                console.log("[Skrypt 1080p v7.4] Twitch: Dodatkowe kliknięcie w trybik → menu zamknięte");
+                console.log("[Skrypt 1080p ] Twitch: Dodatkowe kliknięcie w trybik → menu zamknięte");
             }
         }
 
-        console.log("[Skrypt 1080p v7.4] Menu zamknięte automatycznie");
+        console.log("[Skrypt 1080p ] Menu zamknięte automatycznie");
     }
 
     // ==================== WATCHER – SPADANIE JAKOŚCI ====================
@@ -76,7 +79,7 @@
         watcherInterval = setInterval(() => {
             const res = getCurrentResolution();
             if (res > 0 && res < 1080 && canForce1080) {
-                console.log(`[Skrypt 1080p v7.4] Jakość spadła do ${res}p – wymuszam 1080p z powrotem!`);
+                console.log(`[Skrypt 1080p ] Jakość spadła do ${res}p – wymuszam 1080p z powrotem!`);
                 attempts = 0;
                 if (location.hostname.includes('twitch.tv')) setQualityTwitch();
                 else if (location.hostname.includes('kick.com')) setQualityKick();
@@ -108,7 +111,7 @@
                     clearInterval(attemptInterval);
                     canForce1080 = true;
                     autoCloseMenu();
-                    console.log("[Skrypt 1080p v7.4] Twitch: Już jest 1080p60!");
+                    console.log("[Skrypt 1080p ] Twitch: Już jest 1080p60!");
                     return;
                 }
 
@@ -122,7 +125,7 @@
                         target.click();
                         clearInterval(attemptInterval);
                         canForce1080 = true;
-                        console.log("[Skrypt 1080p v7.4] Twitch: Zmieniono na 1080p60 (Source)");
+                        console.log("[Skrypt 1080p ] Twitch: Zmieniono na 1080p60 (Source)");
                         autoCloseMenu();   // ← teraz na pewno znika
                     } else {
                         autoCloseMenu();
@@ -187,7 +190,7 @@
 
         if (target) {
             simulateClick(target);
-            console.log("[Skrypt 1080p v7.4] Kick: Kliknięto 1080p60!");
+            console.log("[Skrypt 1080p ] Kick: Kliknięto 1080p60!");
             canForce1080 = true;
             return true;
         }
@@ -195,7 +198,7 @@
         const nonAuto = items.filter(i => !/auto/i.test(i.textContent));
         if (nonAuto.length) {
             simulateClick(nonAuto[nonAuto.length - 1]);
-            console.log("[Skrypt 1080p v7.4] Kick: Fallback na najwyższą jakość");
+            console.log("[Skrypt 1080p ] Kick: Fallback na najwyższą jakość");
             return true;
         }
         return false;
@@ -205,7 +208,7 @@
         attempts++;
         if (attempts > MAX_ATTEMPTS) {
             clearInterval(attemptInterval);
-            console.log("[Skrypt 1080p v7.4] Kick: Przekroczono limit prób");
+            console.log("[Skrypt 1080p ] Kick: Przekroczono limit prób");
             return;
         }
 
@@ -216,18 +219,18 @@
 
         const settingsButton = findSettingsButton(video);
         if (!settingsButton) {
-            if (attempts % 5 === 0) console.log(`[Skrypt 1080p v7.4] Kick: ${attempts}/25 - Czekam na trybik...`);
+            if (attempts % 5 === 0) console.log(`[Skrypt 1080p ] Kick: ${attempts}/25 - Czekam na trybik...`);
             return;
         }
 
-        console.log("[Skrypt 1080p v7.4] Kick: Znalazłem trybik → otwieram menu");
+        console.log("[Skrypt 1080p ] Kick: Znalazłem trybik → otwieram menu");
         simulateClick(settingsButton);
 
         setTimeout(() => {
             const success = pickQuality();
             if (success) {
                 clearInterval(attemptInterval);
-                console.log("[Skrypt 1080p v7.4] Kick: SUKCES – 1080p ustawione!");
+                console.log("[Skrypt 1080p ] Kick: SUKCES – 1080p ustawione!");
                 setTimeout(autoCloseMenu, 180);
             } else {
                 autoCloseMenu();
@@ -237,7 +240,7 @@
 
     // ==================== INIT ====================
     function init() {
-        console.log("[Skrypt 1080p v7.4] Uruchamiam...");
+        console.log("[Skrypt 1080p ] Uruchamiam...");
         attempts = 0;
         canForce1080 = false;
         clearInterval(attemptInterval);
@@ -260,7 +263,7 @@
         const url = location.href;
         if (url !== lastUrl) {
             lastUrl = url;
-            console.log("[Skrypt 1080p v7.4] Zmiana kanału → reset");
+            console.log("[Skrypt 1080p ] Zmiana kanału → reset");
             init();
         }
     }).observe(document, { subtree: true, childList: true });
