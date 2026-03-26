@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Force 1080p on Twitch & Kick v7.4
+// @name         Force 1080p on Twitch & Kick
 // @namespace    http://tampermonkey.net/
 // @version      7.4
 // @description  Auto-closes Twitch quality menu reliably (new 2026 UI) + quality drop watcher
@@ -81,7 +81,7 @@
                 if (location.hostname.includes('twitch.tv')) setQualityTwitch();
                 else if (location.hostname.includes('kick.com')) setQualityKick();
             }
-        }, 10000);
+        }, 2000);
     }
 
     // ==================== TWITCH ====================
@@ -127,11 +127,11 @@
                     } else {
                         autoCloseMenu();
                     }
-                }, 650);
+                }, 350);
             } else {
                 autoCloseMenu();
             }
-        }, 600);
+        }, 300);
     }
 
     // ==================== KICK (bez zmian) ====================
@@ -232,7 +232,7 @@
             } else {
                 autoCloseMenu();
             }
-        }, 650);
+        }, 350);
     }
 
     // ==================== INIT ====================
@@ -245,12 +245,12 @@
 
         setTimeout(() => {
             if (location.hostname.includes('twitch.tv')) {
-                attemptInterval = setInterval(setQualityTwitch, 2000);
+                attemptInterval = setInterval(setQualityTwitch, 500);
             } else if (location.hostname.includes('kick.com')) {
-                attemptInterval = setInterval(setQualityKick, 2000);
+                attemptInterval = setInterval(setQualityKick, 500);
             }
             startQualityWatcher();
-        }, 3000);
+        }, 700);
     }
 
     init();
